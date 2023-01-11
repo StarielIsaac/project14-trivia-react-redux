@@ -36,6 +36,7 @@ class Login extends Component {
 
   render() {
     const { user, email, verification } = this.state;
+    const { history } = this.props;
     return (
       <div>
         <Logo />
@@ -71,6 +72,13 @@ class Login extends Component {
             Play
           </button>
         </form>
+        <button
+          type="button"
+          data-testid="btn-settings"
+          onClick={ () => history.push('/settings') }
+        >
+          Configurações
+        </button>
       </div>
     );
   }
@@ -79,5 +87,6 @@ class Login extends Component {
 Login.propTypes = {
   history: PropTypes.shape().isRequired,
 };
+
 
 export default Login;
