@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import Game from './pages/Game';
 import Settings from './pages/Settings';
 
-
 export default function App() {
   return (
     <Switch>

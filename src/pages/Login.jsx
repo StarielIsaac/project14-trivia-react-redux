@@ -88,5 +88,4 @@ Login.propTypes = {
   history: PropTypes.shape().isRequired,
 };
 
-
 export default Login;
