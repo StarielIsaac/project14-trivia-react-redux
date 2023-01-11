@@ -40,7 +40,7 @@ class Login extends Component {
             />
           </label>
           <label htmlFor="email">
-            E-mail:
+            E-mail::
             <input
               type="email"
               name="email"
