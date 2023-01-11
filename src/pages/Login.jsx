@@ -53,7 +53,7 @@ class Login extends Component {
             />
           </label>
           <label htmlFor="email">
-            E-mail::
+            E-mail:
             <input
               type="email"
               name="email"
@@ -64,7 +64,7 @@ class Login extends Component {
             />
           </label>
           <button
-            type="submit"
+            type="button"
             data-testid="btn-play"
             disabled={ verification }
             onClick={ this.handleClick }
@@ -85,7 +85,13 @@ class Login extends Component {
 }
 
 Login.propTypes = {
-  history: PropTypes.shape().isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }),
+};
+
+Login.defaultProps = {
+  history: {},
 };
 
 export default Login;
