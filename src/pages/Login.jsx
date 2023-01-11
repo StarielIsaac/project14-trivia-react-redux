@@ -1,11 +1,23 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Logo from '../components/Logo';
+import requestToken from '../api/requestTrivia';
 
 class Login extends Component {
   state = {
     user: '',
     email: '',
     verification: true,
+  };
+
+  handleClick = async (e) => {
+    e.preventDefault();
+    const { history } = this.props;
+    const date = await requestToken();
+    console.log(date);
+    const { token } = date;
+    history.push('/game');
+    localStorage.setItem('token', token);
   };
 
   HandleChange = ({ target }) => {
@@ -54,6 +66,7 @@ class Login extends Component {
             type="submit"
             data-testid="btn-play"
             disabled={ verification }
+            onClick={ this.handleClick }
           >
             Play
           </button>
@@ -62,5 +75,9 @@ class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  history: PropTypes.shape().isRequired,
+};
 
 export default Login;
