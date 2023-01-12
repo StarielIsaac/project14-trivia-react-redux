@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Logo from '../components/Logo';
-import requestToken from '../api/requestTrivia';
+import { requestToken } from '../api/requestTrivia';
 import { addEmail } from '../redux/actions';
 
-const regex = /[\w.]+@[a-z]+\.com(([a-z]+){1,2})?/i;
+const regex = /[\w.]+@[a-z]+(\.com|(\.[a-z]+){2,3})/i;
 
 class Login extends Component {
   state = {
@@ -18,26 +18,31 @@ class Login extends Component {
     e.preventDefault();
     const { history, dispatch } = this.props;
     const { email, user } = this.state;
-    const date = await requestToken();
-    console.log(date);
-    const { token } = date;
-    history.push('/game');
-    localStorage.setItem('token', token);
+    const obj = await requestToken();
+
     dispatch(addEmail(email, user));
+    const { token } = obj;
+
+    localStorage.setItem('token', token);
+
+    history.push('/game');
   };
 
   HandleChange = ({ target }) => {
     const { value, name } = target;
-    this.setState({
-      [name]: value,
-    }, () => {
-      const { user, email } = this.state;
-      if (user.length > 0 && regex.test(email)) {
-        this.setState({
-          verification: false,
-        });
-      }
-    });
+    this.setState(
+      {
+        [name]: value,
+      },
+      () => {
+        const { user, email } = this.state;
+        if (user.length > 0 && regex.test(email)) {
+          this.setState({
+            verification: false,
+          });
+        }
+      },
+    );
   };
 
   render() {
@@ -92,13 +97,9 @@ class Login extends Component {
 
 Login.propTypes = {
   history: PropTypes.shape({
-    push: PropTypes.func,
-  }),
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   dispatch: PropTypes.func.isRequired,
-};
-
-Login.defaultProps = {
-  history: {},
 };
 
 export default connect()(Login);
