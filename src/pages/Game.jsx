@@ -6,13 +6,13 @@ import './game.css';
 
 const NUMBERTREE = 3;
 const NUMBERFIVE = 5;
-const TIMER = 0;
+const TIMER = 3000;
 
 class Game extends Component {
   state = {
     questions: [],
     validation: false,
-    value: 1,
+    value: 0,
     click: false,
   };
 
@@ -44,6 +44,7 @@ class Game extends Component {
         if (value === NUMBERFIVE) {
           this.setState({
             value: 0,
+            click: false,
           });
         } else {
           this.setState({
