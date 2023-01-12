@@ -10,7 +10,7 @@ class Game extends Component {
   state = {
     questions: [],
     validation: false,
-    value: 0,
+    value: 1,
   };
 
   async componentDidMount() {
