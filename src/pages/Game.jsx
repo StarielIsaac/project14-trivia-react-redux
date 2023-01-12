@@ -2,15 +2,18 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import Header from '../components/Header';
 import { validationToken } from '../api/requestTrivia';
+import './game.css';
 
 const NUMBERTREE = 3;
 const NUMBERFIVE = 5;
+const TIMER = 3000;
 
 class Game extends Component {
   state = {
     questions: [],
     validation: false,
     value: 0,
+    click: false,
   };
 
   async componentDidMount() {
@@ -30,16 +33,26 @@ class Game extends Component {
   }
 
   handleClickAnswer = () => {
-    this.setState((prevState) => ({
-      value: prevState.value + 1,
-    }), () => {
-      const { value } = this.state;
-      if (value === NUMBERFIVE) {
-        this.setState({
-          value: 0,
-        });
-      }
+    this.setState({
+      click: true,
     });
+    setTimeout(() => {
+      this.setState((prevState) => ({
+        value: prevState.value + 1,
+      }), () => {
+        const { value } = this.state;
+        if (value === NUMBERFIVE) {
+          this.setState({
+            value: 0,
+            click: false,
+          });
+        } else {
+          this.setState({
+            click: false,
+          });
+        }
+      });
+    }, TIMER);
   };
 
   shuffleArray = (arr) => {
@@ -51,9 +64,7 @@ class Game extends Component {
   };
 
   render() {
-    const { questions, validation, value } = this.state;
-    console.log(questions);
-    console.log();
+    const { questions, validation, value, click } = this.state;
     return (
       <div>
         <Header />
@@ -69,6 +80,7 @@ class Game extends Component {
                     return (
                       <button
                         key={ indexAnswer }
+                        className={ click ? 'correct' : '' }
                         type="button"
                         onClick={ this.handleClickAnswer }
                         data-testid="correct-answer"
@@ -80,6 +92,7 @@ class Game extends Component {
                   return (
                     <button
                       key={ indexAnswer }
+                      className={ click ? 'incorrect' : '' }
                       type="button"
                       onClick={ this.handleClickAnswer }
                       data-testid={ `wrong-answer-${indexAnswer}` }
