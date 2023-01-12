@@ -21,8 +21,9 @@ class Login extends Component {
     const obj = await requestToken();
 
     dispatch(addEmail(email, user));
+    const { token } = obj;
 
-    localStorage.setItem('token', JSON.stringify(obj.token));
+    localStorage.setItem('token', token);
 
     history.push('/game');
   };
