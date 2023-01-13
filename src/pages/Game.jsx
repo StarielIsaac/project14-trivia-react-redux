@@ -8,6 +8,7 @@ import { changeScore } from '../redux/actions';
 import './game.css';
 
 const NUMBER_TREE = 3;
+const FOUR = 4;
 const TIME_ANSWER = 5000;
 const TIME_QUESTION = 31000;
 const COUNT_ONE_SEG = 1000;
@@ -85,7 +86,7 @@ class Game extends Component {
   ) => {
     const {
       state: { interval, timeout, questions, currentQuestion, time },
-      props: { dispatch },
+      props: { dispatch, history },
     } = this;
 
     clearInterval(interval);
@@ -107,6 +108,8 @@ class Game extends Component {
         click: false,
         disabled: true,
       }));
+    } else if (name === 'next' && currentQuestion === FOUR) {
+      history.push('/feedbeck');
     }
   };
 
