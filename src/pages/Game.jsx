@@ -7,13 +7,21 @@ import './game.css';
 const NUMBERTREE = 3;
 const NUMBERFIVE = 5;
 const TIMER = 3000;
+const TIMEANSWER = 5000;
+const TIMEQUESTION = 30000;
+const COUNTONESEG = 1000;
 
 class Game extends Component {
   state = {
     questions: [],
     validation: false,
-    value: 0,
+    value: -1,
     click: false,
+    disabled: true,
+    time: 30,
+    answerState: [],
+    interval: '',
+    timeout: '',
   };
 
   async componentDidMount() {
@@ -30,9 +38,39 @@ class Game extends Component {
       });
       localStorage.removeItem('token');
     }
+    this.setState({
+      value: 0,
+    });
+  }
+
+  componentDidUpdate(_prevProp, prevState) {
+    const { value, disabled, questions } = this.state;
+    if (prevState.value !== value) {
+      setTimeout(() => {
+        this.setState({
+          disabled: false,
+        });
+      }, TIMEANSWER);
+      const answer = this.shuffleArray(
+        [questions[value].correct_answer, ...questions[value].incorrect_answers],
+      );
+      this.setState({
+        answerState: answer,
+        time: 30,
+      });
+    }
+    if (prevState.disabled !== disabled && disabled !== true) {
+      const myTimeout = setTimeout(() => this.handleClickAnswer(), TIMEQUESTION);
+      const myinteval = setInterval(() => this.setState((state) => (
+        { time: state.time - 1 })), COUNTONESEG);
+      this.setState({ interval: myinteval, timeout: myTimeout });
+    }
   }
 
   handleClickAnswer = () => {
+    const { interval, timeout } = this.state;
+    clearInterval(interval);
+    clearTimeout(timeout);
     this.setState({
       click: true,
     });
@@ -45,10 +83,12 @@ class Game extends Component {
           this.setState({
             value: 0,
             click: false,
+            disabled: true,
           });
         } else {
           this.setState({
             click: false,
+            disabled: true,
           });
         }
       });
@@ -64,43 +104,46 @@ class Game extends Component {
   };
 
   render() {
-    const { questions, validation, value, click } = this.state;
+    const {
+      questions, validation, value, click, disabled, answerState, time } = this.state;
     return (
       <div>
         <Header />
+        <p>{time}</p>
         { validation && <Redirect to="/" /> }
         {questions.map((pergunta, index) => index === value && (
           <div key={ pergunta.question }>
             <h4 data-testid="question-category">{pergunta.category}</h4>
             <p data-testid="question-text">{pergunta.question}</p>
             <div data-testid="answer-options">
-              {this.shuffleArray([pergunta.correct_answer, ...pergunta.incorrect_answers])
-                .map((answer, indexAnswer) => {
-                  if (answer === pergunta.correct_answer) {
-                    return (
-                      <button
-                        key={ indexAnswer }
-                        className={ click ? 'correct' : '' }
-                        type="button"
-                        onClick={ this.handleClickAnswer }
-                        data-testid="correct-answer"
-                      >
-                        {answer}
-                      </button>
-                    );
-                  }
+              {answerState.map((answer, indexAnswer) => {
+                if (answer === pergunta.correct_answer) {
                   return (
                     <button
                       key={ indexAnswer }
-                      className={ click ? 'incorrect' : '' }
+                      className={ click ? 'correct' : '' }
                       type="button"
                       onClick={ this.handleClickAnswer }
-                      data-testid={ `wrong-answer-${indexAnswer}` }
+                      data-testid="correct-answer"
+                      disabled={ disabled }
                     >
                       {answer}
                     </button>
                   );
-                })}
+                }
+                return (
+                  <button
+                    key={ indexAnswer }
+                    className={ click ? 'incorrect' : '' }
+                    type="button"
+                    onClick={ this.handleClickAnswer }
+                    data-testid={ `wrong-answer-${indexAnswer}` }
+                    disabled={ disabled }
+                  >
+                    {answer}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}
