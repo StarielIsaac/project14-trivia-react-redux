@@ -15,7 +15,10 @@ class Header extends Component {
           data-testid="header-profile-picture"
         />
         <span data-testid="header-player-name">{name}</span>
-        <span data-testid="header-score">{score}</span>
+        <span>
+          Score:
+          <span data-testid="header-score">{score}</span>
+        </span>
       </header>
     );
   }
