@@ -33,7 +33,12 @@ class Game extends Component {
     if (apiTrivia.response_code !== NUMBER_TREE) {
       this.setState({
         questions: results,
-        answers: randomAnswers(results, 0),
+        // answers: results.length > 0 && randomAnswers(results, 0),
+      }, () => {
+        const { questions } = this.state;
+        this.setState({
+          answers: randomAnswers(questions, 0),
+        });
       });
 
       startForAnswer();
