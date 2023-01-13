@@ -8,7 +8,6 @@ import { changeScore } from '../redux/actions';
 import './game.css';
 
 const NUMBER_TREE = 3;
-const TIMER = 3000;
 const TIME_ANSWER = 5000;
 const TIME_QUESTION = 31000;
 const COUNT_ONE_SEG = 1000;
@@ -79,7 +78,11 @@ class Game extends Component {
     }
   }
 
-  handlerClick = (currentAns, dificulty) => {
+  handlerClick = (
+    { target: { name } } = { target: { name: '' } },
+    currentAns = false,
+    dificulty = '',
+  ) => {
     const {
       state: { interval, timeout, questions, currentQuestion, time },
       props: { dispatch },
@@ -95,14 +98,15 @@ class Game extends Component {
 
     this.setState({
       click: true,
+      disabled: true,
     });
 
-    if (questions.length > currentQuestion + 1) {
-      setTimeout(() => this.setState((prevState) => ({
+    if (name === 'next' && questions.length > currentQuestion + 1) {
+      this.setState((prevState) => ({
         currentQuestion: prevState.currentQuestion + 1,
         click: false,
         disabled: true,
-      })), TIMER);
+      }));
     }
   };
 
@@ -120,7 +124,6 @@ class Game extends Component {
       const j = Math.floor(Math.random() * (i + 1));
       [answersJoined[i], answersJoined[j]] = [answersJoined[j], answersJoined[i]];
     }
-
     return answersJoined;
   };
 
@@ -147,7 +150,8 @@ class Game extends Component {
                 key={ `aswer-${i + 1}` }
                 className={ click ? 'correct' : '' }
                 type="button"
-                onClick={ () => handlerClick(
+                onClick={ (e) => handlerClick(
+                  e,
                   true,
                   questions[currentQuestion].dificulty,
                 ) }
@@ -161,13 +165,26 @@ class Game extends Component {
                 key={ `aswer-${i + 1}` }
                 className={ click ? 'incorrect' : '' }
                 type="button"
-                onClick={ () => handlerClick(false) }
+                onClick={ (e) => handlerClick(e, false) }
                 data-testid={ `wrong-answer-${i}` }
                 disabled={ disabled }
               >
                 {answer}
               </button>
             )))}
+          {
+            click
+            && (
+              <button
+                data-testid="btn-next"
+                type="button"
+                onClick={ handlerClick }
+                name="next"
+              >
+                Next
+              </button>
+            )
+          }
         </div>
       </>
     );
