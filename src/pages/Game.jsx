@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
+import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { validationToken } from '../api';
+import calculateScore from './helps/calculaScore';
+import { changeScore } from '../redux/actions';
 import './game.css';
 
 const NUMBER_TREE = 3;
@@ -76,13 +79,19 @@ class Game extends Component {
     }
   }
 
-  handlerClick = () => {
+  handlerClick = (currentAns, dificulty) => {
     const {
-      state: { interval, timeout, questions, currentQuestion },
+      state: { interval, timeout, questions, currentQuestion, time },
+      props: { dispatch },
     } = this;
 
     clearInterval(interval);
     clearTimeout(timeout);
+
+    if (currentAns) {
+      const valueScore = calculateScore(time, dificulty);
+      dispatch(changeScore(valueScore));
+    }
 
     this.setState({
       click: true,
@@ -138,7 +147,10 @@ class Game extends Component {
                 key={ `aswer-${i + 1}` }
                 className={ click ? 'correct' : '' }
                 type="button"
-                onClick={ handlerClick }
+                onClick={ () => handlerClick(
+                  true,
+                  questions[currentQuestion].dificulty,
+                ) }
                 data-testid="correct-answer"
                 disabled={ disabled }
               >
@@ -149,7 +161,7 @@ class Game extends Component {
                 key={ `aswer-${i + 1}` }
                 className={ click ? 'incorrect' : '' }
                 type="button"
-                onClick={ handlerClick }
+                onClick={ () => handlerClick(false) }
                 data-testid={ `wrong-answer-${i}` }
                 disabled={ disabled }
               >
@@ -166,6 +178,7 @@ Game.propTypes = {
   history: propTypes.shape({
     push: propTypes.func.isRequired,
   }).isRequired,
+  dispatch: propTypes.func.isRequired,
 };
 
-export default Game;
+export default connect()(Game);
