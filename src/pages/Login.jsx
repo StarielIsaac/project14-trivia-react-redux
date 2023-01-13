@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Logo from '../components/Logo';
-import { requestToken } from '../api/requestTrivia';
+import { requestToken } from '../api';
 import { addEmail } from '../redux/actions';
 
 const regex = /[\w.]+@[a-z]+(\.com|(\.[a-z]+){2,3})/i;
@@ -14,71 +14,90 @@ class Login extends Component {
     verification: true,
   };
 
-  handleClick = async (e) => {
-    e.preventDefault();
-    const { history, dispatch } = this.props;
-    const { email, user } = this.state;
-    const obj = await requestToken();
+  handlerClick = async () => {
+    const {
+      state: { email, user },
+      props: { history, dispatch },
+    } = this;
+
+    const { token } = await requestToken();
 
     dispatch(addEmail(email, user));
-    const { token } = obj;
 
     localStorage.setItem('token', token);
 
     history.push('/game');
   };
 
-  HandleChange = ({ target }) => {
-    const { value, name } = target;
+  handlerKey = ({ key }) => {
+    const {
+      state: { verification },
+      handlerClick,
+    } = this;
+
+    if (key === 'Enter' && verification === false) handlerClick();
+  };
+
+  handlerChange = ({ target: { value, name } }) => {
     this.setState(
       {
         [name]: value,
       },
       () => {
-        const { user, email } = this.state;
-        if (user.length > 0 && regex.test(email)) {
-          this.setState({
-            verification: false,
-          });
-        }
+        const {
+          state: { user, email },
+        } = this;
+
+        this.setState({
+          verification: user.length === 0 || !regex.test(email),
+        });
       },
     );
   };
 
   render() {
-    const { user, email, verification } = this.state;
-    const { history } = this.props;
+    const {
+      state: { user, email, verification },
+      props: { history },
+      handlerChange,
+      handlerClick,
+      handlerKey,
+    } = this;
+
     return (
       <div>
         <Logo />
         <form>
           <label htmlFor="name">
             Nome:
+            {' '}
             <input
               type="text"
               name="user"
               id="name"
               data-testid="input-player-name"
               value={ user }
-              onChange={ this.HandleChange }
+              onChange={ handlerChange }
             />
           </label>
           <label htmlFor="email">
-            E-mail::
+            E-mail:
+            {' '}
             <input
               type="email"
               name="email"
               id="email"
               data-testid="input-gravatar-email"
               value={ email }
-              onChange={ this.HandleChange }
+              onChange={ handlerChange }
+              onKeyUp={ handlerKey }
             />
           </label>
           <button
             type="button"
             data-testid="btn-play"
             disabled={ verification }
-            onClick={ this.handleClick }
+            onClick={ handlerClick }
           >
             Play
           </button>
