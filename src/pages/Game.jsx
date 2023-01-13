@@ -1,155 +1,166 @@
 import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
+import propTypes from 'prop-types';
 import Header from '../components/Header';
-import { validationToken } from '../api/requestTrivia';
+import { validationToken } from '../api';
 import './game.css';
 
-const NUMBERTREE = 3;
-const NUMBERFIVE = 5;
+const NUMBER_TREE = 3;
 const TIMER = 3000;
-const TIMEANSWER = 5000;
-const TIMEQUESTION = 30000;
-const COUNTONESEG = 1000;
+const TIME_ANSWER = 5000;
+const TIME_QUESTION = 31000;
+const COUNT_ONE_SEG = 1000;
 
 class Game extends Component {
   state = {
     questions: [],
-    validation: false,
-    value: -1,
+    currentQuestion: 0,
     click: false,
     disabled: true,
     time: 30,
-    answerState: [],
-    interval: '',
-    timeout: '',
+    answers: [],
+    interval: undefined,
+    timeout: undefined,
   };
 
   async componentDidMount() {
-    const token = localStorage.getItem('token');
-    const apiTrivia = await validationToken(token);
+    const {
+      props: { history },
+      startForAnswer,
+      randomAnswers,
+    } = this;
+    const apiTrivia = await validationToken(localStorage.getItem('token'));
     const { results } = apiTrivia;
-    if (apiTrivia.response_code !== NUMBERTREE) {
+    if (apiTrivia.response_code !== NUMBER_TREE) {
       this.setState({
         questions: results,
+        answers: randomAnswers(results, 0),
       });
+
+      startForAnswer();
     } else {
-      this.setState({
-        validation: true,
-      });
+      history.push('/');
       localStorage.removeItem('token');
     }
-    this.setState({
-      value: 0,
-    });
   }
 
   componentDidUpdate(_prevProp, prevState) {
-    const { value, disabled, questions } = this.state;
-    if (prevState.value !== value) {
-      setTimeout(() => {
-        this.setState({
-          disabled: false,
-        });
-      }, TIMEANSWER);
-      const answer = this.shuffleArray(
-        [questions[value].correct_answer, ...questions[value].incorrect_answers],
-      );
+    const {
+      state: { currentQuestion, disabled, questions },
+      handlerClick,
+      startForAnswer,
+      randomAnswers,
+    } = this;
+
+    if (prevState.currentQuestion !== currentQuestion) {
+      startForAnswer();
+
       this.setState({
-        answerState: answer,
+        answers: randomAnswers(questions, currentQuestion),
         time: 30,
       });
     }
-    if (prevState.disabled !== disabled && disabled !== true) {
-      const myTimeout = setTimeout(() => this.handleClickAnswer(), TIMEQUESTION);
-      const myinteval = setInterval(() => this.setState((state) => (
-        { time: state.time - 1 })), COUNTONESEG);
-      this.setState({ interval: myinteval, timeout: myTimeout });
+
+    if (prevState.disabled !== disabled && disabled === false) {
+      const timeout = setTimeout(() => handlerClick(), TIME_QUESTION);
+      const interval = setInterval(
+        () => this.setState((state) => ({ time: state.time - 1 })),
+        COUNT_ONE_SEG,
+      );
+
+      this.setState({ interval, timeout });
     }
   }
 
-  handleClickAnswer = () => {
-    const { interval, timeout } = this.state;
+  handlerClick = () => {
+    const {
+      state: { interval, timeout, questions, currentQuestion },
+    } = this;
+
     clearInterval(interval);
     clearTimeout(timeout);
+
     this.setState({
       click: true,
     });
-    setTimeout(() => {
-      this.setState((prevState) => ({
-        value: prevState.value + 1,
-      }), () => {
-        const { value } = this.state;
-        if (value === NUMBERFIVE) {
-          this.setState({
-            value: 0,
-            click: false,
-            disabled: true,
-          });
-        } else {
-          this.setState({
-            click: false,
-            disabled: true,
-          });
-        }
-      });
-    }, TIMER);
+
+    if (questions.length > currentQuestion + 1) {
+      setTimeout(() => this.setState((prevState) => ({
+        currentQuestion: prevState.currentQuestion + 1,
+        click: false,
+        disabled: true,
+      })), TIMER);
+    }
   };
 
-  shuffleArray = (arr) => {
-    for (let i = arr.length - 1; i > 0; i -= 1) {
+  startForAnswer = () => setTimeout(
+    () => this.setState({
+      disabled: false,
+    }),
+    TIME_ANSWER,
+  );
+
+  randomAnswers = (arr, index) => {
+    const answersJoined = [arr[index].correct_answer, ...arr[index].incorrect_answers];
+
+    for (let i = answersJoined.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+      [answersJoined[i], answersJoined[j]] = [answersJoined[j], answersJoined[i]];
     }
-    return arr;
+
+    return answersJoined;
   };
 
   render() {
     const {
-      questions, validation, value, click, disabled, answerState, time } = this.state;
+      state: { questions, currentQuestion, click, disabled, answers, time },
+      handlerClick,
+    } = this;
+
     return (
-      <div>
+      <>
         <Header />
         <p>{time}</p>
-        { validation && <Redirect to="/" /> }
-        {questions.map((pergunta, index) => index === value && (
-          <div key={ pergunta.question }>
-            <h4 data-testid="question-category">{pergunta.category}</h4>
-            <p data-testid="question-text">{pergunta.question}</p>
-            <div data-testid="answer-options">
-              {answerState.map((answer, indexAnswer) => {
-                if (answer === pergunta.correct_answer) {
-                  return (
-                    <button
-                      key={ indexAnswer }
-                      className={ click ? 'correct' : '' }
-                      type="button"
-                      onClick={ this.handleClickAnswer }
-                      data-testid="correct-answer"
-                      disabled={ disabled }
-                    >
-                      {answer}
-                    </button>
-                  );
-                }
-                return (
-                  <button
-                    key={ indexAnswer }
-                    className={ click ? 'incorrect' : '' }
-                    type="button"
-                    onClick={ this.handleClickAnswer }
-                    data-testid={ `wrong-answer-${indexAnswer}` }
-                    disabled={ disabled }
-                  >
-                    {answer}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+        <h2 data-testid="question-category">
+          {questions.length !== 0 ? questions[currentQuestion].category : ''}
+        </h2>
+        <h3 data-testid="question-text">
+          {questions.length !== 0 ? questions[currentQuestion].question : ''}
+        </h3>
+        <div data-testid="answer-options">
+          { answers.map((answer, i) => (
+            answer === questions[currentQuestion].correct_answer ? (
+              <button
+                key={ `aswer-${i + 1}` }
+                className={ click ? 'correct' : '' }
+                type="button"
+                onClick={ handlerClick }
+                data-testid="correct-answer"
+                disabled={ disabled }
+              >
+                {answer}
+              </button>
+            ) : (
+              <button
+                key={ `aswer-${i + 1}` }
+                className={ click ? 'incorrect' : '' }
+                type="button"
+                onClick={ handlerClick }
+                data-testid={ `wrong-answer-${i}` }
+                disabled={ disabled }
+              >
+                {answer}
+              </button>
+            )))}
+        </div>
+      </>
     );
   }
 }
+
+Game.propTypes = {
+  history: propTypes.shape({
+    push: propTypes.func.isRequired,
+  }).isRequired,
+};
 
 export default Game;
