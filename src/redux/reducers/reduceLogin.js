@@ -1,17 +1,21 @@
-import { ADD_EMAIL } from '../actions';
+import { ADD_EMAIL, CHANGE_SCORE } from '../actions';
 
 const INITIAL_STATE = {
-  email: '',
-  user: '',
+  name: '',
+  assertions: 0,
+  score: 0,
+  gravatarEmail: '',
 };
 
-const reduceLogin = (state = INITIAL_STATE, { type, payload }) => {
+const player = (state = INITIAL_STATE, { type, payload }) => {
   switch (type) {
   case ADD_EMAIL:
-    return { ...state, email: payload.email, user: payload.user };
+    return { ...state, gravatarEmail: payload.email, name: payload.user };
+  case CHANGE_SCORE:
+    return { ...state, score: state.score + payload };
   default:
     return state;
   }
 };
 
-export default reduceLogin;
+export default player;
