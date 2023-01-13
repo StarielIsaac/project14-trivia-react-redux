@@ -1,7 +1,7 @@
 const TEN = 10;
 const TREE = 3;
 
-const calculateScore = (timer, dificulty) => {
+export const calculateScore = (timer, dificulty) => {
   const valueDifuculty = () => {
     if (dificulty === 'hard') {
       return TREE;
@@ -14,4 +14,9 @@ const calculateScore = (timer, dificulty) => {
   return TEN + (timer * valueDifuculty());
 };
 
-export default calculateScore;
+export const returnMessage = (assertions) => {
+  if (assertions < TREE) {
+    return 'Could be better...';
+  }
+  return 'Well Done!';
+};
