@@ -5,7 +5,6 @@ import { validationToken } from '../api';
 import './game.css';
 
 const NUMBER_TREE = 3;
-const TIMER = 3000;
 const TIME_ANSWER = 5000;
 const TIME_QUESTION = 31000;
 const COUNT_ONE_SEG = 1000;
@@ -76,7 +75,7 @@ class Game extends Component {
     }
   }
 
-  handlerClick = () => {
+  handlerClick = ({ target: { name } } = { target: { name: '' } }) => {
     const {
       state: { interval, timeout, questions, currentQuestion },
     } = this;
@@ -86,14 +85,15 @@ class Game extends Component {
 
     this.setState({
       click: true,
+      disabled: true,
     });
 
-    if (questions.length > currentQuestion + 1) {
-      setTimeout(() => this.setState((prevState) => ({
+    if (name === 'next' && questions.length > currentQuestion + 1) {
+      this.setState((prevState) => ({
         currentQuestion: prevState.currentQuestion + 1,
         click: false,
         disabled: true,
-      })), TIMER);
+      }));
     }
   };
 
@@ -111,7 +111,6 @@ class Game extends Component {
       const j = Math.floor(Math.random() * (i + 1));
       [answersJoined[i], answersJoined[j]] = [answersJoined[j], answersJoined[i]];
     }
-
     return answersJoined;
   };
 
@@ -156,6 +155,19 @@ class Game extends Component {
                 {answer}
               </button>
             )))}
+          {
+            click
+            && (
+              <button
+                data-testid="btn-next"
+                type="button"
+                onClick={ handlerClick }
+                name="next"
+              >
+                Next
+              </button>
+            )
+          }
         </div>
       </>
     );
