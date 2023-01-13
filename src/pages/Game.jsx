@@ -78,7 +78,11 @@ class Game extends Component {
     }
   }
 
-  handlerClick = ({ target: { name } } = { target: { name: '' } }, currentAns = false, dificulty = '') => {
+  handlerClick = (
+    { target: { name } } = { target: { name: '' } },
+    currentAns = false,
+    dificulty = '',
+  ) => {
     const {
       state: { interval, timeout, questions, currentQuestion, time },
       props: { dispatch },
