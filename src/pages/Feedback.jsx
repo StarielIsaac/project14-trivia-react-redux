@@ -13,6 +13,7 @@ class Feedback extends Component {
         <h3 data-testid="feedback-text">{returnMessage(assertions)}</h3>
         <h5 data-testid="feedback-total-score">{score}</h5>
         <h5 data-testid="feedback-total-question">{assertions}</h5>
+        <button type="button">Play Again</button>
       </div>
     );
   }
