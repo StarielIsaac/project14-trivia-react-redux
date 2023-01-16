@@ -35,7 +35,7 @@ class Login extends Component {
       handlerClick,
     } = this;
 
-    if (key === 'Enter' && verification === false) handlerClick();
+    if (key === 'Enter' && !verification) handlerClick();
   };
 
   handlerChange = ({ target: { value, name } }) => {

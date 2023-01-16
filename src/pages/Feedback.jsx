@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { returnMessage } from './helps/calculaScore';
+import { returnMessage } from './helpers';
 import Header from '../components/Header';
 
 class Feedback extends Component {
