@@ -1,6 +1,7 @@
 export const ADD_EMAIL = 'ADD_EMAIL';
 export const CHANGE_SCORE = 'CHANGE_SCORE';
 export const SOME_ASSERTION = 'SOME_ASSERTION';
+export const RESET_STATE = 'RESET_STATE';
 
 export const addEmail = (email, user) => ({
   type: ADD_EMAIL,
@@ -15,4 +16,8 @@ export const changeScore = (pont) => ({
 export const someAcertion = (assertions) => ({
   type: SOME_ASSERTION,
   payload: assertions,
+});
+
+export const resetState = () => ({
+  type: RESET_STATE,
 });
