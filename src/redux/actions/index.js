@@ -5,6 +5,8 @@ export const RESET_STATE = 'RESET_STATE';
 export const ADD_PLAYER = 'ADD_PLAYER';
 export const LOAD_RANKING = 'LOAD_RANKING';
 
+const NUMBER_ONE = -1;
+
 export const addEmail = (email, user) => ({
   type: ADD_EMAIL,
   payload: { email, user },
@@ -25,13 +27,15 @@ export const resetState = () => ({
 });
 
 export const addPlayer = (player) => {
+  console.log(player);
   const ranking = JSON.parse(localStorage.getItem('ranking')) || [];
   const playerIndex = ranking.findIndex((p) => p.name === player.name);
-  if (playerIndex === '-1') {
+  if (playerIndex === NUMBER_ONE) {
     ranking.push(player);
   } else if (ranking[playerIndex].score < player.score) {
     ranking[playerIndex] = player;
   }
+  console.log(ranking);
   ranking.sort((a, b) => b.score - a.score);
   localStorage.setItem('ranking', JSON.stringify(ranking));
   return {
