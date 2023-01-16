@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
 import App from '../App';
-import obj from './helpers/mocks';
+import { obj } from './helpers/mocks';
 
 describe('Testando a tela inicial', () => {
   test('Verifica se na tela possui capos para inserir nome e email', () => {
