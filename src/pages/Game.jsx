@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { validationToken } from '../api';
 import { calculateScore } from './helps';
-import { changeScore, someAcertion } from '../redux/actions';
+import { changeScore, someAcertion, addPlayer } from '../redux/actions';
 import './game.css';
 
 const NUMBER_TREE = 3;
@@ -86,7 +86,7 @@ class Game extends Component {
   ) => {
     const {
       state: { interval, timeout, questions, currentQuestion, time },
-      props: { dispatch, history },
+      props: { dispatch, history, player },
     } = this;
 
     clearInterval(interval);
@@ -110,6 +110,7 @@ class Game extends Component {
         disabled: true,
       }));
     } else if (name === 'next' && currentQuestion === FOUR) {
+      dispatch(addPlayer(player));
       history.push('/feedbeck');
     }
   };
@@ -200,6 +201,11 @@ Game.propTypes = {
     push: propTypes.func.isRequired,
   }).isRequired,
   dispatch: propTypes.func.isRequired,
+  player: propTypes.shape({}).isRequired,
 };
 
-export default connect()(Game);
+const mapStateToProps = (state) => ({
+  player: state.player,
+});
+
+export default connect(mapStateToProps)(Game);
