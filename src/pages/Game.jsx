@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Header from '../components/Header';
 import { validationToken } from '../api';
-import { calculateScore } from './helps/calculaScore';
+import { calculateScore } from './helps';
 import { changeScore, someAcertion } from '../redux/actions';
 import './game.css';
 

@@ -1,4 +1,4 @@
-import { ADD_EMAIL, CHANGE_SCORE, SOME_ASSERTION } from '../actions';
+import { ADD_EMAIL, CHANGE_SCORE, SOME_ASSERTION, RESET_STATE } from '../actions';
 
 const INITIAL_STATE = {
   name: '',
@@ -15,6 +15,13 @@ const player = (state = INITIAL_STATE, { type, payload }) => {
     return { ...state, score: state.score + payload };
   case SOME_ASSERTION:
     return { ...state, assertions: state.assertions + payload };
+  case RESET_STATE:
+    return {
+      name: '',
+      assertions: 0,
+      score: 0,
+      gravatarEmail: '',
+    };
   default:
     return state;
   }
