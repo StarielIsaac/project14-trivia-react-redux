@@ -74,3 +74,61 @@ export const questionsResponse = {
     },
   ],
 };
+
+export const localStorageMock = (() => {
+  let store = {
+    ranking: [
+      { name: 'Ricardo', assertions: 4, score: 200, gravatarEmail: 'ricardo@am.com' },
+      { name: 'José', assertions: 3, score: 160, gravatarEmail: 'jose@am.com' },
+      { name: 'Maria', assertions: 5, score: 240, gravatarEmail: 'maria@am.com' },
+    ],
+  };
+
+  return {
+    getItem(key) {
+      return JSON.stringify(store[key]);
+    },
+
+    setItem(key, value) {
+      store[key] = value;
+    },
+
+    clear() {
+      store = {};
+    },
+
+    removeItem(key) {
+      delete store[key];
+    },
+
+    getAll() {
+      return store;
+    },
+  };
+})();
+
+export const localStorageMockClear = (() => {
+  let store = {};
+
+  return {
+    getItem(key) {
+      return JSON.stringify(store[key]);
+    },
+
+    setItem(key, value) {
+      store[key] = value;
+    },
+
+    clear() {
+      store = {};
+    },
+
+    removeItem(key) {
+      delete store[key];
+    },
+
+    getAll() {
+      return store;
+    },
+  };
+})();
