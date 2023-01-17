@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Logo from '../components/Logo';
+import { Logo } from '../components';
 import { requestToken } from '../api';
 import { addEmail } from '../redux/actions';
 
@@ -35,7 +35,7 @@ class Login extends Component {
       handlerClick,
     } = this;
 
-    if (key === 'Enter' && verification === false) handlerClick();
+    if (key === 'Enter' && !verification) handlerClick();
   };
 
   handlerChange = ({ target: { value, name } }) => {
