@@ -1,8 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
+import {renderWithRouterAndRedux, tokenValid } from './helpers';
 import App from '../App';
-import obj from './helpers/mocks';
 
 describe('Testando a tela inicial', () => {
   test('Verifica se na tela possui capos para inserir nome e email', () => {
@@ -25,9 +24,12 @@ describe('Testando a tela inicial', () => {
     expect(inputEmail).toBeDefined();
   });
   test('Verifica se o botão é habilitado ao prencher nome e email', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({
-      json: () => Promise.resolve(obj),
-    }));
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(tokenValid),
+      }),
+    );
+
     const { history } = renderWithRouterAndRedux(<App />);
 
     const nameInput = screen.getByRole('textbox', {
