@@ -60,7 +60,6 @@ describe('Testando a tela inicial', () => {
     expect(buttonConfig).toBeDefined();
 
     userEvent.click(buttonConfig);
-
     expect(history.location.pathname).toBe('/settings');
   });
 });
