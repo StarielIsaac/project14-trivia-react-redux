@@ -14,7 +14,7 @@ const COUNT_ONE_SEG = 1000;
 
 class Game extends Component {
   state = {
-    questions: [],
+    questions: null,
     currentQuestion: 0,
     click: false,
     disabled: true,
@@ -31,6 +31,7 @@ class Game extends Component {
     } = this;
     const apiTrivia = await validationToken(localStorage.getItem('token'));
     const { results } = apiTrivia;
+
     if (apiTrivia.response_code !== NUMBER_TREE) {
       this.setState(
         {
@@ -132,10 +133,10 @@ class Game extends Component {
         <Header />
         <p>{time}</p>
         <h2 data-testid="question-category">
-          {questions.length !== 0 ? questions[currentQuestion].category : ''}
+          {questions ? questions[currentQuestion].category : ''}
         </h2>
         <h3 data-testid="question-text">
-          {questions.length !== 0 ? questions[currentQuestion].question : ''}
+          {questions ? questions[currentQuestion].question : ''}
         </h3>
         <div data-testid="answer-options">
           { answers.map((answer, i) => (

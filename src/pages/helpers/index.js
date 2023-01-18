@@ -27,12 +27,17 @@ export const returnMessage = (assertions) => {
 };
 
 export const randomAnswers = (arr, index) => {
-  const answersJoined = [arr[index].correct_answer, ...arr[index].incorrect_answers];
+  if (arr) {
+    const answersJoined = [arr[index].correct_answer, ...arr[index].incorrect_answers];
 
-  for (let i = answersJoined.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [answersJoined[i], answersJoined[j]] = [answersJoined[j], answersJoined[i]];
+    for (let i = arr && answersJoined.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+
+      [answersJoined[i], answersJoined[j]] = [answersJoined[j], answersJoined[i]];
+    }
+
+    return answersJoined;
   }
 
-  return answersJoined;
+  return [];
 };

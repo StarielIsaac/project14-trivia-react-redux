@@ -12,13 +12,13 @@ class Ranking extends Component {
   }
 
   render() {
-    const { ranking, history } = this.props;
+    const { topPlayers, history } = this.props;
 
     return (
       <div>
         <h1 data-testid="ranking-title">Ranking</h1>
         <ul>
-          {ranking.map(({ name, score, gravatarEmail }, i) => {
+          {topPlayers.map(({ name, score, gravatarEmail }, i) => {
             const hash = md5(gravatarEmail).toString();
 
             return (
@@ -45,7 +45,7 @@ class Ranking extends Component {
 }
 
 Ranking.propTypes = {
-  ranking: propTypes.arrayOf(propTypes.shape({
+  topPlayers: propTypes.arrayOf(propTypes.shape({
     name: propTypes.string.isRequired,
     score: propTypes.number.isRequired,
     gravatarEmail: propTypes.string.isRequired,
@@ -56,8 +56,8 @@ Ranking.propTypes = {
   dispatch: propTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ ranking: { ranking } }) => ({
-  ranking,
+const mapStateToProps = ({ ranking: { topPlayers } }) => ({
+  topPlayers,
 });
 
 export default connect(mapStateToProps)(Ranking);

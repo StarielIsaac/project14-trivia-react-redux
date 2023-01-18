@@ -67,11 +67,11 @@
       "index.js",
       "serviceWorker.js",
       "src/services/*",
-      "src/pages/Config.js",
+      "src/pages/Settings.jsx",
       "src/redux/*",
       "src/store/*",
       "src/utils/*",
-      "src/tests/helpers/*"
+      "src/tests/*"
     ]
   }
 }
