@@ -141,7 +141,7 @@ class Game extends Component {
     return (
       <>
         <Header />
-        <p>{time}</p>
+        <p data-testid="time">{time}</p>
         <h2 data-testid="question-category">
           {questions.length !== 0 ? questions[currentQuestion].category : ''}
         </h2>

@@ -75,6 +75,12 @@ export const questionsResponse = {
   ],
 };
 
+export const invalidTokenQuestionsResponse = {
+  response_code: 3,
+  results: [],
+}
+
+
 export const localStorageMock = (() => {
   let store = {
     ranking: [
