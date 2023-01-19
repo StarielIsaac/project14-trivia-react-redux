@@ -1,108 +1,26 @@
-import { findByAltText, findByText, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
+import { tokenInvalid, questions, renderWithRouterAndRedux } from './helpers';
 import App from '../App';
-import { questionsResponse, invalidTokenQuestionsResponse } from './helpers/mocks'
 
 describe('Testanto tela game', () => {
-  jest.setTimeout(1100000)
-  test('Verifica se o jogo possui 5 questões e na ultima ele redireciona para tela de feedbeck', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({
-      json: () => Promise.resolve(questionsResponse),
-    }));
-    const { history } = renderWithRouterAndRedux(<App/>);
-    const nameInput = screen.getByRole('textbox', {
-      name: /nome:/i,
-    });
+  jest.setTimeout(1100000);
 
-    const inputEmail = screen.getByRole('textbox', {
-      name: /e-mail:/i,
-    });
-
-    const buttonPlay = screen.getByRole('button', {
-      name: /play/i,
-    });
-
-    userEvent.type(nameInput, 'eduardo');
-    userEvent.type(inputEmail, 'dudu@email.com');
-    userEvent.click(buttonPlay);
-    await waitForElementToBeRemoved(inputEmail);
-
-    const category = await screen.findByText(/Geography/i)
-    expect(category).toBeInTheDocument();
-
-    const question =  screen.getByText('The Republic of Malta is the smallest microstate worldwide.');
-    expect(question).toBeInTheDocument();
-
-    const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(2);
-
-    const incorrectAnswers = screen.getByRole('button', {name: 'True'})
-    await waitFor(() => expect(incorrectAnswers).not.toBeDisabled(),{timeout: 5500})
-    userEvent.click(incorrectAnswers);
-
-    const score = screen.getByTestId('header-score');
-    expect(score).toBeInTheDocument();
-
-    const buttonNext = screen.getByTestId('btn-next');
-    userEvent.click(buttonNext);
-
-    const question2 = screen.getByText('In quantum physics, which of these theorised sub-atomic particles has yet to be observed?');
-    expect(question2).toBeInTheDocument();
-
-    const correcAnswer2 = screen.getByTestId('correct-answer');
-    await waitFor(() => expect(correcAnswer2).not.toBeDisabled(),{timeout: 5500});
-    userEvent.click(correcAnswer2);
-
-    const buttonNext2 = screen.getByTestId('btn-next');
-    userEvent.click(buttonNext2);
-
-    const question3 = screen.getByText("Generally, which component of a computer draws the most power?");
-    expect(question3).toBeInTheDocument();
-
-    const correcAnswer3 = screen.getByTestId('correct-answer');
-    await waitFor(() => expect(correcAnswer3).not.toBeDisabled(),{timeout: 5500});
-    userEvent.click(correcAnswer3);
-
-    const buttonNext3 = screen.getByTestId('btn-next');
-    userEvent.click(buttonNext3);
-
-    const question4 = screen.getByText('What is the most expensive weapon in Counter-Strike: Global Offensive?');
-    expect(question4).toBeInTheDocument();
-
-    const timer = screen.getByTestId('time');
-    expect(timer).toHaveTextContent(30);
-
-    await waitFor(() => expect(screen.getByTestId('btn-next')).toBeInTheDocument() ,{timeout: 36500});
-    const timer2 = screen.getByTestId('time');
-    expect(timer2).toHaveTextContent(0);
-
-    const buttonNext4 = screen.getByTestId('btn-next');
-    userEvent.click(buttonNext4);
-
-    const question5 = screen.getByText('Who was the Author of the manga Uzumaki?');
-    expect(question5).toBeInTheDocument();
-
-    const correcAnswer5 = screen.getByTestId('correct-answer');
-    await waitFor(() => expect(correcAnswer5).not.toBeDisabled(),{timeout: 5500});
-    userEvent.click(correcAnswer5);
-
-    const buttonNext5 = screen.getByTestId('btn-next');
-    userEvent.click(buttonNext5);
-
-    const { pathname } = history.location;
-
-    expect(pathname).toBe('/feedbeck');
-
-    const scoreTotal = screen.getByTestId('feedback-total-score');
-    expect(scoreTotal).toBeInTheDocument();
-    expect(scoreTotal).toHaveTextContent(120)
-  });
   test('Verifica se token for invalido a pagina é redirecionada para tela principal', async () => {
-    global.fetch = jest.fn(() => Promise.resolve({
-      json: () => Promise.resolve(invalidTokenQuestionsResponse),
-    }));
-    const { history } = renderWithRouterAndRedux(<App/>);
+    global.fetch = jest
+      .fn(() =>
+        Promise.resolve({
+          json: () => Promise.resolve(tokenInvalid),
+        }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          json: () => Promise.resolve('123abc'),
+        }),
+      );
+
+    const { history } = renderWithRouterAndRedux(<App />);
+
     const nameInput = screen.getByRole('textbox', {
       name: /nome:/i,
     });
@@ -115,16 +33,148 @@ describe('Testanto tela game', () => {
       name: /play/i,
     });
 
-    userEvent.type(nameInput, 'eduardo');
-    userEvent.type(inputEmail, 'dudu@email.com');
+    userEvent.type(nameInput, 'João');
+    userEvent.type(inputEmail, 'joao@email.com');
+
     userEvent.click(buttonPlay);
-    await waitForElementToBeRemoved(inputEmail);
 
-    const nameUser = screen.getByTestId('header-player-name');
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+      expect(history.location.pathname).toBe('/');
+    });
+  });
 
-    await waitForElementToBeRemoved(nameUser);
+  test('Verifica se após 5 segundos o time decrementa a cada segundo e ao acabar, o botão para próxima pergunta aparece.', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(questions),
+      }),
+    );
 
-    const { pathname } = history.location;
-    expect(pathname).toBe('/');
+    renderWithRouterAndRedux(<App />, { initialEntries: ['/game'] });
+
+    const answers = await screen.findAllByTestId(/wrong-answer|correct-answer/i);
+
+    await waitFor(() => expect(answers[0]).not.toBeDisabled(), { timeout: 5500 });
+
+    for (let i = 30; i >= 0; i--) {
+      await waitFor(() => expect(screen.getByTestId('time')).toHaveTextContent(i), {
+        timeout: 1500,
+      });
+    }
+
+    for (const button of answers) {
+      expect(button).toBeInTheDocument();
+      await waitFor(() => expect(button).toBeDisabled());
+    }
+
+    expect(await screen.findByTestId('btn-next')).toBeVisible();
+    expect(await screen.findByTestId('btn-next')).not.toBeDisabled();
+  });
+
+  test('Verifica se o jogo acumula os pontos acertando todas as questões.', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(questions),
+      }),
+    );
+
+    const { results } = questions;
+
+    const { history, store } = renderWithRouterAndRedux(<App />, {
+      initialEntries: ['/game'],
+    });
+
+    for (const { category, correct_answer, question, incorrect_answers } of results) {
+      expect(await screen.findByText(category)).toBeVisible();
+      expect(await screen.findByText(question)).toBeVisible();
+
+      const answers = screen.getAllByTestId(/wrong-answer|correct-answer/i);
+
+      expect(answers).toHaveLength(incorrect_answers.length + 1);
+
+      for (const button of answers) {
+        expect(button).toHaveAttribute('type', 'button');
+        expect(button).toBeVisible();
+        expect(button).toBeDisabled();
+      }
+
+      const correct = screen.getByText(correct_answer);
+
+      await waitFor(() => expect(correct).not.toBeDisabled(), { timeout: 5500 });
+
+      userEvent.click(correct);
+
+      if (question === results[results.length - 1].question) {
+        const scoreTotal = screen.getByTestId('header-score');
+
+        expect(scoreTotal).toBeVisible();
+        expect(scoreTotal).toHaveTextContent(/200/);
+      }
+
+      userEvent.click(await screen.findByTestId('btn-next'));
+    }
+
+    await waitFor(() => expect(history.location.pathname).toBe('/feedbeck'));
+
+    const {
+      player: { score, assertions },
+    } = store.getState();
+
+    expect(score).toEqual(200);
+    expect(assertions).toEqual(5);
+  });
+
+  test('Verifica se o jogo não acumula os pontos errando todas as questões.', async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve(questions),
+      }),
+    );
+
+    const { results } = questions;
+
+    const { history, store } = renderWithRouterAndRedux(<App />, {
+      initialEntries: ['/game'],
+    });
+
+    for (const { category, question, incorrect_answers } of results) {
+      expect(await screen.findByText(category)).toBeVisible();
+      expect(await screen.findByText(question)).toBeVisible();
+
+      const answers = screen.getAllByTestId(/wrong-answer|correct-answer/i);
+
+      expect(answers).toHaveLength(incorrect_answers.length + 1);
+
+      for (const button of answers) {
+        expect(button).toHaveAttribute('type', 'button');
+        expect(button).toBeVisible();
+        expect(button).toBeDisabled();
+      }
+      const index = Math.floor(Math.random() * incorrect_answers.length);
+      const incorrect = screen.getByText(incorrect_answers[index]);
+
+      await waitFor(() => expect(incorrect).not.toBeDisabled(), { timeout: 5500 });
+
+      userEvent.click(incorrect);
+
+      if (question === results[results.length - 1].question) {
+        const scoreTotal = screen.getByTestId('header-score');
+
+        expect(scoreTotal).toBeVisible();
+        expect(scoreTotal).toHaveTextContent(/0/);
+      }
+
+      userEvent.click(await screen.findByTestId('btn-next'));
+    }
+
+    await waitFor(() => expect(history.location.pathname).toBe('/feedbeck'));
+
+    const {
+      player: { score, assertions },
+    } = store.getState();
+
+    expect(score).toEqual(0);
+    expect(assertions).toEqual(0);
   });
 });

@@ -1,17 +1,68 @@
-/* eslint-disable max-len */
-export const obj = { response_code: 0,
+export const tokenValid = {
+  response_code: 0,
+  results: [
+    {
+      category: 'Science: Computers',
+      type: 'multiple',
+      difficulty: 'medium',
+      question:
+        'Which of the following languages is used as a scripting language in the Unity 3D game engine?',
+      correct_answer: 'C#',
+      incorrect_answers: ['Java', 'C++', 'Objective-C'],
+    },
+
+    {
+      category: 'Entertainment: Video Games',
+      type: 'multiple',
+      difficulty: 'medium',
+      question:
+        'In the first Left 4 Dead, you can play as either of these four characters.',
+      correct_answer: 'Francis, Bill, Zoey, and Louis',
+      incorrect_answers: [
+        'Bender, Andrew, Allison, and Brian',
+        'Coach, Ellis, Nick, and Rochelle',
+        'Harry, Ron, Hermione and Dumbledore',
+      ],
+    },
+
+    {
+      category: 'General Knowledge',
+      type: 'multiple',
+      difficulty: 'medium',
+      question: 'What was the original name of the search engine &quot;Google&quot;?',
+      correct_answer: 'BackRub',
+      incorrect_answers: ['CatMassage', 'SearchPro', 'Netscape Navigator'],
+    },
+
+    {
+      category: 'Entertainment: Comics',
+      type: 'multiple',
+      difficulty: 'medium',
+      question: 'Who was the inspiration for Cuthbert Calculus in the Tintin series?',
+      correct_answer: 'Auguste Picard',
+      incorrect_answers: ['Jacques Piccard', 'Will Morris', 'J. Cecil Maby'],
+    },
+
+    {
+      category: 'General Knowledge',
+      type: 'multiple',
+      difficulty: 'easy',
+      question:
+        'Foie gras is a French delicacy typically made from what part of a duck or goose?',
+      correct_answer: 'Liver',
+      incorrect_answers: ['Heart', 'Stomach', 'Intestines'],
+    },
+  ],
   response_message: 'Token Generated Successfully!',
   token: '508b87ccf72cab7115abaace5a4459ffb36f42479a25614413936c8ad8b5deea',
 };
 
-export const userMaicon = {
-  name: 'Maicon',
-  assertions: 4,
-  score: 120,
-  gravatarEmail: 'maicon@email.com',
+export const tokenInvalid = {
+  response_code: 3,
+  results: [],
 };
 
-export const questionsResponse = {
+export const questions = {
   response_code: 0,
   results: [
     {
@@ -20,21 +71,16 @@ export const questionsResponse = {
       difficulty: 'easy',
       question: 'The Republic of Malta is the smallest microstate worldwide.',
       correct_answer: 'False',
-      incorrect_answers: [
-        'True',
-      ],
+      incorrect_answers: ['True'],
     },
     {
       category: 'Science & Nature',
       type: 'multiple',
       difficulty: 'hard',
-      question: 'In quantum physics, which of these theorised sub-atomic particles has yet to be observed?',
+      question:
+        'In quantum physics, which of these theorised sub-atomic particles has yet to be observed?',
       correct_answer: 'Graviton',
-      incorrect_answers: [
-        'Z boson',
-        'Tau neutrino',
-        'Gluon',
-      ],
+      incorrect_answers: ['Z boson', 'Tau neutrino', 'Gluon'],
     },
     {
       category: 'Science: Computers',
@@ -42,11 +88,7 @@ export const questionsResponse = {
       difficulty: 'medium',
       question: 'Generally, which component of a computer draws the most power?',
       correct_answer: 'Video Card',
-      incorrect_answers: [
-        'Hard Drive',
-        'Processor',
-        'Power Supply',
-      ],
+      incorrect_answers: ['Hard Drive', 'Processor', 'Power Supply'],
     },
     {
       category: 'Entertainment: Video Games',
@@ -54,11 +96,7 @@ export const questionsResponse = {
       difficulty: 'easy',
       question: 'What is the most expensive weapon in Counter-Strike: Global Offensive?',
       correct_answer: 'Scar-20/G3SG1',
-      incorrect_answers: [
-        'M4A1',
-        'AWP',
-        'R8 Revolver',
-      ],
+      incorrect_answers: ['M4A1', 'AWP', 'R8 Revolver'],
     },
     {
       category: 'Entertainment: Japanese Anime & Manga',
@@ -66,20 +104,17 @@ export const questionsResponse = {
       difficulty: 'hard',
       question: 'Who was the Author of the manga Uzumaki?',
       correct_answer: 'Junji Ito',
-      incorrect_answers: [
-        'Noboru Takahashi',
-        'Akira Toriyama',
-        'Masashi Kishimoto',
-      ],
+      incorrect_answers: ['Noboru Takahashi', 'Akira Toriyama', 'Masashi Kishimoto'],
     },
   ],
 };
 
-export const invalidTokenQuestionsResponse = {
-  response_code: 3,
-  results: [],
-}
-
+export const userMaicon = {
+  name: 'Maicon',
+  assertions: 4,
+  score: 120,
+  gravatarEmail: 'maicon@email.com',
+};
 
 export const localStorageMock = (() => {
   let store = {

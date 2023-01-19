@@ -49,6 +49,7 @@
   "devDependencies": {
     "@sheerun/mutationobserver-shim": "0.3.3",
     "@testing-library/react": "^13.3.0",
+    "@types/jest": "^29.2.5",
     "cypress": "^10.4.0",
     "cypress-multi-reporters": "^1.6.1",
     "eslint-config-trybe-frontend": "1.3.1",
@@ -66,11 +67,11 @@
       "index.js",
       "serviceWorker.js",
       "src/services/*",
-      "src/pages/Config.js",
+      "src/pages/Settings.jsx",
       "src/redux/*",
       "src/store/*",
       "src/utils/*",
-      "src/tests/helpers/*"
+      "src/tests/*"
     ]
   }
 }

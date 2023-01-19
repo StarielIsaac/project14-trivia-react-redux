@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Logo from '../components/Logo';
+import { Logo } from '../components';
 import { requestToken } from '../api';
 import { addEmail } from '../redux/actions';
 
@@ -29,6 +29,15 @@ class Login extends Component {
     history.push('/game');
   };
 
+  handlerKey = ({ key }) => {
+    const {
+      state: { verification },
+      handlerClick,
+    } = this;
+
+    if (key === 'Enter' && !verification) handlerClick();
+  };
+
   handlerChange = ({ target: { value, name } }) => {
     this.setState(
       {
@@ -52,6 +61,7 @@ class Login extends Component {
       props: { history },
       handlerChange,
       handlerClick,
+      handlerKey,
     } = this;
 
     return (
@@ -80,6 +90,7 @@ class Login extends Component {
               data-testid="input-gravatar-email"
               value={ email }
               onChange={ handlerChange }
+              onKeyUp={ handlerKey }
             />
           </label>
           <button

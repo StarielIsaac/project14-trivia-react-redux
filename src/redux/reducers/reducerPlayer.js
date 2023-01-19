@@ -7,24 +7,21 @@ const INITIAL_STATE = {
   gravatarEmail: '',
 };
 
-const player = (state = INITIAL_STATE, { type, payload }) => {
+export default (state = INITIAL_STATE, { type, payload }) => {
   switch (type) {
   case ADD_EMAIL:
     return { ...state, gravatarEmail: payload.email, name: payload.user };
+
   case CHANGE_SCORE:
     return { ...state, score: state.score + payload };
+
   case SOME_ASSERTION:
     return { ...state, assertions: state.assertions + payload };
+
   case RESET_STATE:
-    return {
-      name: '',
-      assertions: 0,
-      score: 0,
-      gravatarEmail: '',
-    };
+    return INITIAL_STATE;
+
   default:
     return state;
   }
 };
-
-export default player;
