@@ -1,32 +1,48 @@
-import { screen, act } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
-import Feedback from '../pages/Feedback';
+import { renderWithRouterAndRedux, maiconSucess, maiconFail } from './helpers';
 import App from '../App';
-import { userMaicon } from './helpers/mocks';
 
 describe('Testando a tela de Feedback', () => {
-  test('Verifica se a menssagem correta é exbida', () => {
-    renderWithRouterAndRedux(<Feedback />, userMaicon);
+  test('Verifica se a messagem `Well Done!` corretamente.', async () => {
+    renderWithRouterAndRedux(<App />, {
+      initialState: { player: { ...maiconSucess } },
+      initialEntries: ['/feedbeck'],
+    });
 
     const feedbackMessage = screen.getByTestId('feedback-text');
+    const pointsScore = screen.getByTestId('feedback-total-score');
+    const countAssertions = screen.getByTestId('feedback-total-question');
 
-    expect(feedbackMessage).toBeInTheDocument();
+    expect(feedbackMessage).toBeVisible();
+    expect(pointsScore).toBeVisible();
+    expect(countAssertions).toBeVisible();
+    expect(feedbackMessage).toHaveTextContent('Well Done!');
+    expect(pointsScore).toHaveTextContent(maiconSucess.score);
+    expect(countAssertions).toHaveTextContent(maiconSucess.assertions);
+  });
+
+  test('Verifica se a messagem `Could be better...` corretamente.', async () => {
+    renderWithRouterAndRedux(<App />, {
+      initialState: { player: { ...maiconFail } },
+      initialEntries: ['/feedbeck'],
+    });
+
+    const feedbackMessage = screen.getByTestId('feedback-text');
+    const pointsScore = screen.getByTestId('feedback-total-score');
+    const countAssertions = screen.getByTestId('feedback-total-question');
+
+    expect(feedbackMessage).toBeVisible();
+    expect(pointsScore).toBeVisible();
+    expect(countAssertions).toBeVisible();
     expect(feedbackMessage).toHaveTextContent('Could be better...');
+    expect(pointsScore).toHaveTextContent(maiconFail.score);
+    expect(countAssertions).toHaveTextContent(maiconFail.assertions);
   });
-  test('Verifica se os elemento relacionados ao resultado são renderizados', () => {
-    renderWithRouterAndRedux(<Feedback />, userMaicon);
 
-    const feedbackScore = screen.getByTestId('feedback-total-score');
-    const feedbackAssertion = screen.getByTestId('feedback-total-question');
-
-    expect(feedbackScore).toBeInTheDocument();
-    expect(feedbackAssertion).toBeInTheDocument();
-  });
   test('Verifica se o botão "Play Again" retorna para tela inicial', async () => {
-    const { history } = renderWithRouterAndRedux(<App />);
-    act(() => {
-      history.push('/feedbeck');
+    const { history } = renderWithRouterAndRedux(<App />, {
+      initialEntries: ['/feedbeck'],
     });
 
     const buttonPlayAgain = screen.getByTestId('btn-play-again');
@@ -36,9 +52,8 @@ describe('Testando a tela de Feedback', () => {
     expect(pathname).toBe('/');
   });
   test('Verifica se o botão "Ranking" redireciona para de Ranking', async () => {
-    const { history } = renderWithRouterAndRedux(<App />);
-    act(() => {
-      history.push('/feedbeck');
+    const { history } = renderWithRouterAndRedux(<App />, {
+      initialEntries: ['/feedbeck'],
     });
 
     const buttonRanking = screen.getByTestId('btn-ranking');

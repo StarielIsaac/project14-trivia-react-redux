@@ -109,10 +109,17 @@ export const questions = {
   ],
 };
 
-export const userMaicon = {
+export const maiconSucess = {
   name: 'Maicon',
   assertions: 4,
   score: 120,
+  gravatarEmail: 'maicon@email.com',
+};
+
+export const maiconFail = {
+  name: 'Maicon',
+  assertions: 2,
+  score: 90,
   gravatarEmail: 'maicon@email.com',
 };
 
