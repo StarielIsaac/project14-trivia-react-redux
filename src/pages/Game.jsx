@@ -1,21 +1,20 @@
 import React, { Component } from 'react';
 import propTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Header from '../components/Header';
+import { Header } from '../components';
 import { validationToken } from '../api';
-import { calculateScore } from './helps';
+import { calculateScore, randomAnswers } from './helpers';
 import { changeScore, someAcertion, addPlayer } from '../redux/actions';
 import './game.css';
 
 const NUMBER_TREE = 3;
-const FOUR = 4;
 const TIME_ANSWER = 5000;
 const TIME_QUESTION = 31000;
 const COUNT_ONE_SEG = 1000;
 
 class Game extends Component {
   state = {
-    questions: [],
+    questions: null,
     currentQuestion: 0,
     click: false,
     disabled: true,
@@ -29,22 +28,25 @@ class Game extends Component {
     const {
       props: { history },
       startForAnswer,
-      randomAnswers,
     } = this;
     const apiTrivia = await validationToken(localStorage.getItem('token'));
     const { results } = apiTrivia;
-    if (apiTrivia.response_code !== NUMBER_TREE) {
-      this.setState({
-        questions: results,
-        // answers: results.length > 0 && randomAnswers(results, 0),
-      }, () => {
-        const { questions } = this.state;
-        this.setState({
-          answers: randomAnswers(questions, 0),
-        });
-      });
 
-      startForAnswer();
+    if (apiTrivia.response_code !== NUMBER_TREE) {
+      this.setState(
+        {
+          questions: results,
+        },
+        () => {
+          const {
+            state: { questions, currentQuestion },
+          } = this;
+
+          this.setState({
+            answers: randomAnswers(questions, currentQuestion),
+          }, () => startForAnswer());
+        },
+      );
     } else {
       history.push('/');
       localStorage.removeItem('token');
@@ -56,19 +58,16 @@ class Game extends Component {
       state: { currentQuestion, disabled, questions },
       handlerClick,
       startForAnswer,
-      randomAnswers,
     } = this;
 
     if (prevState.currentQuestion !== currentQuestion) {
-      startForAnswer();
-
       this.setState({
         answers: randomAnswers(questions, currentQuestion),
         time: 30,
-      });
+      }, () => startForAnswer());
     }
 
-    if (prevState.disabled !== disabled && disabled === false) {
+    if (prevState.disabled !== disabled && !disabled) {
       const timeout = setTimeout(() => handlerClick(), TIME_QUESTION);
       const interval = setInterval(
         () => this.setState((state) => ({ time: state.time - 1 })),
@@ -92,16 +91,16 @@ class Game extends Component {
     clearInterval(interval);
     clearTimeout(timeout);
 
+    this.setState({
+      click: true,
+      disabled: true,
+    });
+
     if (currentAns) {
       const valueScore = calculateScore(time, dificulty);
       dispatch(changeScore(valueScore));
       dispatch(someAcertion(1));
     }
-
-    this.setState({
-      click: true,
-      disabled: true,
-    });
 
     if (name === 'next' && questions.length > currentQuestion + 1) {
       this.setState((prevState) => ({
@@ -109,8 +108,9 @@ class Game extends Component {
         click: false,
         disabled: true,
       }));
-    } else if (name === 'next' && currentQuestion === FOUR) {
+    } else if (name === 'next' && questions.length === currentQuestion + 1) {
       dispatch(addPlayer(player));
+
       history.push('/feedbeck');
     }
   };
@@ -122,16 +122,6 @@ class Game extends Component {
     TIME_ANSWER,
   );
 
-  randomAnswers = (arr, index) => {
-    const answersJoined = [arr[index].correct_answer, ...arr[index].incorrect_answers];
-
-    for (let i = answersJoined.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [answersJoined[i], answersJoined[j]] = [answersJoined[j], answersJoined[i]];
-    }
-    return answersJoined;
-  };
-
   render() {
     const {
       state: { questions, currentQuestion, click, disabled, answers, time },
@@ -141,12 +131,12 @@ class Game extends Component {
     return (
       <>
         <Header />
-        <p>{time}</p>
+        <p data-testid="time">{time}</p>
         <h2 data-testid="question-category">
-          {questions.length !== 0 ? questions[currentQuestion].category : ''}
+          {questions ? questions[currentQuestion].category : ''}
         </h2>
         <h3 data-testid="question-text">
-          {questions.length !== 0 ? questions[currentQuestion].question : ''}
+          {questions ? questions[currentQuestion].question : ''}
         </h3>
         <div data-testid="answer-options">
           { answers.map((answer, i) => (
@@ -158,7 +148,7 @@ class Game extends Component {
                 onClick={ (e) => handlerClick(
                   e,
                   true,
-                  questions[currentQuestion].dificulty,
+                  questions[currentQuestion].difficulty,
                 ) }
                 data-testid="correct-answer"
                 disabled={ disabled }
@@ -170,7 +160,7 @@ class Game extends Component {
                 key={ `aswer-${i + 1}` }
                 className={ click ? 'incorrect' : '' }
                 type="button"
-                onClick={ (e) => handlerClick(e, false) }
+                onClick={ handlerClick }
                 data-testid={ `wrong-answer-${i}` }
                 disabled={ disabled }
               >
@@ -201,11 +191,16 @@ Game.propTypes = {
     push: propTypes.func.isRequired,
   }).isRequired,
   dispatch: propTypes.func.isRequired,
-  player: propTypes.shape({}).isRequired,
+  player: propTypes.shape({
+    name: propTypes.string.isRequired,
+    assertions: propTypes.number.isRequired,
+    score: propTypes.number.isRequired,
+    gravatarEmail: propTypes.string.isRequired,
+  }).isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  player: state.player,
+const mapStateToProps = ({ player }) => ({
+  player,
 });
 
 export default connect(mapStateToProps)(Game);
