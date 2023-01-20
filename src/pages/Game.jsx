@@ -148,7 +148,7 @@ class Game extends Component {
                 onClick={ (e) => handlerClick(
                   e,
                   true,
-                  questions[currentQuestion].dificulty,
+                  questions[currentQuestion].difficulty,
                 ) }
                 data-testid="correct-answer"
                 disabled={ disabled }
